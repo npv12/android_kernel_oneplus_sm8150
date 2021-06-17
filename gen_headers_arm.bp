@@ -469,6 +469,8 @@ gen_headers_out_arm = [
     "linux/psci.h",
     "linux/ptp_clock.h",
     "linux/ptrace.h",
+    "linux/qbg.h",
+    "linux/qbg-profile.h",
     "linux/qbt1000.h",
     "linux/qcedev.h",
     "linux/qcota.h",
