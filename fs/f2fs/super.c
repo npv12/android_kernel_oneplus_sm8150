@@ -4342,15 +4342,12 @@ static int __init init_f2fs_fs(void)
 	err = f2fs_init_compress_cache();
 	if (err)
 		goto free_compress_mempool;
-<<<<<<< HEAD
 
 	f2fs_init_rapid_gc();
 
-=======
 	err = f2fs_create_casefold_cache();
 	if (err)
 		goto free_compress_cache;
->>>>>>> 99698cfca4a0cbca53bade248a10f6ef5e433a04
 	return 0;
 free_compress_cache:
 	f2fs_destroy_compress_cache();
