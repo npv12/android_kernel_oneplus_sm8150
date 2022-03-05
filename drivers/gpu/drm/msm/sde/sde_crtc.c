@@ -3566,7 +3566,7 @@ ssize_t oneplus_display_notify_dim(struct device *dev,
 	dsi_connector = dsi_display->drm_conn;
 	mode_config = &drm_dev->mode_config;
 	sscanf(buf, "%du", &dim_status);
-	if ((oneplus_panel_status == 0))
+	if (oneplus_panel_status == 0)
 		dim_status = 0;
 
 	if (dsi_display->panel->aod_status == 0 && (dim_status == 2)) {
