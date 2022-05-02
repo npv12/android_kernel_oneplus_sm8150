@@ -46,6 +46,7 @@
 #include <linux/cpufreq.h>
 //#include <linux/wakelock.h>
 #include <linux/oneplus/boot_mode.h>
+#include <linux/devfreq_boost.h>
 #include "gf_spi.h"
 
 #if defined(USE_SPI_BUS)
@@ -341,8 +342,8 @@ static int irq_setup(struct gf_dev *gf_dev)
 
 	gf_dev->irq = gf_irq_num(gf_dev);
 	status = request_threaded_irq(gf_dev->irq, NULL, gf_irq,
-			IRQF_TRIGGER_RISING | IRQF_ONESHOT |
-			IRQF_PRIME_AFFINE, "gf", gf_dev);
+			IRQF_TRIGGER_RISING | IRQF_ONESHOT |IRQF_NO_SUSPEND | IRQF_FORCE_RESUME | IRQF_PRIME_AFFINE,
+			"gf", gf_dev);
 
 	if (status) {
 		pr_err("failed to request IRQ:%d\n", gf_dev->irq);
@@ -672,6 +673,7 @@ int gf_opticalfp_irq_handler(int event)
 		return 0;
 	}
 	if (event == 1) {
+		devfreq_boost_kick_max(DEVFREQ_CPU_LLCC_DDR_BW, 500);
 		msg = GF_NET_EVENT_TP_TOUCHDOWN;
 		sendnlmsg(&msg);
 	} else if (event == 0) {
@@ -696,7 +698,7 @@ static int goodix_fb_state_chg_callback(struct notifier_block *nb,
 
 	if (val != FB_EARLY_EVENT_BLANK)
 		return 0;
-	pr_info("[info] %s go to the goodix_fb_state_chg_callback value = %d\n",
+	pr_debug("[info] %s go to the goodix_fb_state_chg_callback value = %d\n",
 			__func__, (int)val);
 	gf_dev = container_of(nb, struct gf_dev, notifier);
 

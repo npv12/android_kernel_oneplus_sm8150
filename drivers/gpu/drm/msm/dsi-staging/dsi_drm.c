@@ -20,7 +20,6 @@
 #include "msm_kms.h"
 #include "sde_connector.h"
 #include "dsi_drm.h"
-#include "sde_trace.h"
 #include "sde_encoder.h"
 #include "sde_dbg.h"
 
@@ -149,9 +148,7 @@ void dsi_convert_to_drm_mode(const struct dsi_display_mode *dsi_mode,
 		drm_mode->flags |= DRM_MODE_FLAG_CMD_MODE_PANEL;
 
 	/* set mode name */
-	snprintf(drm_mode->name, DRM_DISPLAY_MODE_LEN, "%dx%dx%dx%d",
-			drm_mode->hdisplay, drm_mode->vdisplay,
-			drm_mode->vrefresh, drm_mode->clock);
+	*drm_mode->name = '\0';
 }
 
 static int dsi_bridge_attach(struct drm_bridge *bridge)
@@ -202,24 +199,19 @@ static void dsi_bridge_pre_enable(struct drm_bridge *bridge)
 		return;
 	}
 
-	SDE_ATRACE_BEGIN("dsi_display_prepare");
 	rc = dsi_display_prepare(c_bridge->display);
 	if (rc) {
 		pr_err("[%d] DSI display prepare failed, rc=%d\n",
 		       c_bridge->id, rc);
-		SDE_ATRACE_END("dsi_display_prepare");
 		return;
 	}
-	SDE_ATRACE_END("dsi_display_prepare");
 
-	SDE_ATRACE_BEGIN("dsi_display_enable");
 	rc = dsi_display_enable(c_bridge->display);
 	if (rc) {
 		pr_err("[%d] DSI display enable failed, rc=%d\n",
 				c_bridge->id, rc);
 		(void)dsi_display_unprepare(c_bridge->display);
 	}
-	SDE_ATRACE_END("dsi_display_enable");
 
 	rc = dsi_display_splash_res_cleanup(c_bridge->display);
 	if (rc)
@@ -298,25 +290,19 @@ static void dsi_bridge_post_disable(struct drm_bridge *bridge)
 		return;
 	}
 
-	SDE_ATRACE_BEGIN("dsi_bridge_post_disable");
-	SDE_ATRACE_BEGIN("dsi_display_disable");
 	rc = dsi_display_disable(c_bridge->display);
 	if (rc) {
 		pr_err("[%d] DSI display disable failed, rc=%d\n",
 		       c_bridge->id, rc);
-		SDE_ATRACE_END("dsi_display_disable");
 		return;
 	}
-	SDE_ATRACE_END("dsi_display_disable");
 
 	rc = dsi_display_unprepare(c_bridge->display);
 	if (rc) {
 		pr_err("[%d] DSI display unprepare failed, rc=%d\n",
 		       c_bridge->id, rc);
-		SDE_ATRACE_END("dsi_bridge_post_disable");
 		return;
 	}
-	SDE_ATRACE_END("dsi_bridge_post_disable");
 }
 
 static void dsi_bridge_mode_set(struct drm_bridge *bridge,
